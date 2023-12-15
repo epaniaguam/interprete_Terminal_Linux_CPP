@@ -217,6 +217,25 @@ int main()
   elementoscmd.insert(elementoscmd.end(), argumentos.begin(), argumentos.end());
 
   /******************************* FIN DE LA EXTRACCIÓN  ********************************/
+  /************************* AGREGAR LOS ARGUMENTOS PARA EXECV **************************/
+  char **args = nullptr;
+  
+  // Número inicial de argumentos
+  int num_args = 0;
+  
+  // Añadir elementos iterativamente desde el vector de strings
+  for (const auto& str : elementoscmd) {
+      args = static_cast<char**>(realloc(args, (num_args + 1) * sizeof(char*)));
+      args[num_args] = strdup(str.c_str());
+      num_args++;
+  }
+  
+  // Añadir el último elemento nulo
+  args = static_cast<char**>(realloc(args, (num_args + 1) * sizeof(char*)));
+  args[num_args] = nullptr;
+  num_args++;
+  
+  /******************************* FIN ARGUMENTOS PARA EXECV  ********************************/
 
   return 0;
 }
