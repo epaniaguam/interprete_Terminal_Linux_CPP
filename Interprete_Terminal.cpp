@@ -25,10 +25,29 @@ void inprimirTerminal()
 {
   filesystem::path currentPath = filesystem::current_path();
 
-  auto it = currentPath.begin();
-  advance(it, 2);
+  // Separar la ruta en directorios y almacenarlos en un vector
+  vector<string> directories;
 
-  cout << PURPLE << it->string() << YELLOW << "@" << GREEN_LIGHT << "ESIS" << WHITE << ":" << YELLOW << "$ " << SKYBLUE_LIGHT; //<< RESET
+  for (const auto &entry : currentPath)
+  {
+    directories.push_back(entry.string());
+  }
+
+  cout << BLUE << directories[2] << YELLOW << "@" << GREEN_LIGHT << "ESIS" << WHITE << ":" << PURPLE;
+
+  if (directories.size() < 3)
+  {
+    for (int i = 0; i < directories.size(); i++)
+      cout << "/" << directories[i];
+  }
+  else
+  {
+    cout << "~";
+    for (int i = 3; i < directories.size(); i++)
+      cout << "/" << directories[i];
+  }
+
+  cout << YELLOW << "$ " << SKYBLUE_LIGHT; //<< RESET
 }
 
 void reconocerHomeUser(string &ruta)
@@ -192,6 +211,21 @@ int main()
     if (comando_general == "salir")
     {
       break;
+    }
+    else if (comando_general.substr(0, 2) == "cd")
+    {
+      // Extraer el argumento de la cadena de comando (ruta del directorio)
+      std::string directory = comando_general.substr(3);
+
+      if (chdir(directory.c_str()) == 0)
+      {
+        std::cout << "Directorio cambiado exitosamente." << std::endl;
+      }
+      else
+      {
+        perror("Error al cambiar el directorio");
+      }
+      continue;
     }
 
     string rutaComando, cmd, rutaRedireccionamiento;
