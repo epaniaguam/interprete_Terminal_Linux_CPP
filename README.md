@@ -35,6 +35,13 @@ Para usar este intérprete de terminal, ejecuta el programa compilado:
 | `mv`             | `<origen> <destino>`   | Mueve archivos o directorios. Ejemplo: `mv archivo.txt carpeta/` |
 | `vim`            | `<archivo>`            | Editor de texto avanzado en la terminal. Ejemplo: `vim archivo.txt` |
 
+Los comandos que siguen deben descargarse e instalarse en la linux antes de poder ejecutarse, para descargarlos se debe ejecutar "sudo apt install [Comandos Descargable]" fuera del programa
+
+| Comandos Descargable | Descripción                                             |
+|-----------|---------------------------------------------------------|
+| neofetch | Muestra informacion util del sistema y sus componentes fisicos |
+| tree | Muestra un árbol de los directorios |
+| git | Muestra un árbol de los directorios |
 
 ## Comando para salir del terminal
 Para finalizar la ejecución de la terminal deberemos introducir el comando "salir".
