@@ -17,6 +17,8 @@ Para usar este intérprete de terminal, ejecuta el programa compilado:
 ```bash
 ./Interprete_Terminal
 ```
-
+> [!WARNING]
+> El comando de "cd" no es funcional se debe utilizar rutas absolutas o relativas para ejecutar los comandos
 > [!NOTE]
-> Tips
+> En caso se quiera ejecutar un comando distinto al de la carpeta /bin/ se debe especificar al inicio del comando.
+
