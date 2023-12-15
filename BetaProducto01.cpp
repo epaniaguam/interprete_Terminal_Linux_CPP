@@ -70,6 +70,119 @@ string dosArgumentosConEspacio(string &input){
         return "";
     }
 }
+string extraerRutacomando(string &input)
+{
+    string ruta = "";
+    //regex expruta("^(~|\\.|\\/)+(?:[a-zA-Z0-9_-]+\\/?)+"); // Expresión regular
+    regex expruta("^(~|\\.|\\/)+(?:[a-zA-Z0-9_-]+\\/?)+(\\.[a-zA-Z0-9]+)*");  //Expresion mejorada aun para poner a prueba
+    smatch match;                        // variable de regex para almacenar la coincidencia
+
+    bool coincide_ruta = regex_search(input, match, expruta);
+
+    if (coincide_ruta)
+    {
+        ruta = match.str(); // Extrae la ruta encontrada
+        if(input.length() > ruta.length())
+            input = input.substr(ruta.length()+1, input.length());
+        else
+            input = input.substr(ruta.length(), input.length());
+    }else{
+        int posRedir = input.find(">");
+        if(posRedir != string::npos){
+            ruta = input.substr(0,posRedir-1);
+            input = input.substr(posRedir,input.length());
+        }else{
+            ruta = input;
+            input = "";
+        }
+    }
+    return ruta;
+}
+string extraerComando(string &input)
+{
+    string comando = "";
+    if(input == "")
+        return comando;
+    else {
+        regex exp("^[a-zA-Z]+"); // Expresión regular
+        smatch match;        // variable de regex para almacenar la coincidencia
+
+        bool coincide = regex_search(input, match, exp);
+
+        if (coincide)
+        {
+            comando = match.str(); // Extrae la ruta encontrada
+            if(input.length() > comando.length())
+                input = input.substr(comando.length()+1, input.length());
+            else if(input.length() == comando.length())
+                input = "";
+        }
+        return comando;
+    }
+}
+string extraerArgumentos(string &input)
+{
+    // Ejemplos de como se veria un comando
+        // "ls -lsa /home/ > salida.txt"
+        // "ls -lsa ./home/ > salida.txt"
+        // "ls -lsa ~/Descargas/ > ~/Descargas/salida.txt"
+    
+    // Buscar la primera aparición de "/" o "./" o "~"
+    int found1 = input.find("/");
+    int found2 = input.find("../");
+    int found3 = input.find("./");
+    int found4 = input.find("~");
+    int found5 = input.find(">");
+    
+    // Encontrar el índice de la primera aparición
+    int posterminoClave = string::npos; // Valor predeterminado
+    
+    if (found1 != string::npos)
+        posterminoClave = found1;
+    // verificamos si se encontro found2 y que aparesca antes de found1
+    if (found2 != string::npos && (posterminoClave == string::npos || found2 < posterminoClave))
+        posterminoClave = found2;
+    // igual que en el caso anterior
+    if (found3 != string::npos && (posterminoClave == string::npos || found3 < posterminoClave))
+        posterminoClave = found3;
+    // igual que en el caso anterior
+    if (found4 != string::npos && (posterminoClave == string::npos || found4 < posterminoClave))
+        posterminoClave = found4;
+    if (found5 != string::npos && (posterminoClave == string::npos || found5 < posterminoClave))
+        posterminoClave = found5;
+
+
+    string argumentos,subcadena;
+    argumentos = "";
+    if(input[0] != '-')
+        return argumentos;
+
+    regex expresion("(^\\s+)|(\\s+$)");
+
+    if (posterminoClave != string::npos) {
+        // Si se encuentra "/" o "./" o "~" o ">", extraer los argumentos antes de.
+
+        subcadena = input.substr(0, posterminoClave);
+        argumentos = regex_replace(subcadena, expresion, ""); // elimina espacios antes y despues de la cadena
+        
+        input = input.substr(posterminoClave, input.length());
+
+    } else {
+        // Si no se encuentra terminos clave, toma la cadena completa
+        argumentos = input;
+    }
+    return argumentos;
+
+}
+void extraerRedireccion(string &input,string &redireccion, string &archivo){
+    if(input != ""){
+        redireccion = input.substr(0,1);
+        input = input.substr(1,input.length());
+        if(input.length() >= 1 && input[0] == ' ') //verifica si existe mas luego de la redireccion y elimina el espacio
+            archivo = input.substr(1,input.length());
+    }
+}
+
 
 
 int main()
@@ -79,5 +192,12 @@ int main()
     ruta = extraerRuta(inputComando);
         
     dosArgumentos = dosArgumentosConEspacio(inputComando); //funcion para capturar dos argumentos con espacio
-  
+    argOrigen = dosArgumentos.substr(0,dosArgumentos.find(" "));
+    argDestino = dosArgumentos.substr(dosArgumentos.find(" ")+1,dosArgumentos.length());
+
+
+    comando = extraerComando(inputComando);
+    argumentos = extraerArgumentos(inputComando);
+    rutaComando = extraerRutacomando(inputComando);
+
 }
