@@ -30,6 +30,19 @@ void inprimirTerminal()
   cout << PURPLE << it->string() << "@ESIS" << WHITE << ":" << YELLOW << " $ " << SKYBLUE; //<< RESET
 }
 
+void reconocerHomeUser(string &ruta){
+    if(ruta[0] == '~'){
+        const char* homeDir = getenv("HOME"); // Obtener el directorio de inicio del usuario
+        
+        if (homeDir == nullptr) {
+            cerr << "No se pudo obtener el directorio de inicio del usuario." << endl;
+        }else{
+            ruta = ruta.substr(1,ruta.length());
+            ruta = string(homeDir) + ruta;
+        }
+    }
+}
+
 string comprobarRutaComando(string &input, string &cmd)
 {
   string rutaComando = "/bin/";
@@ -101,6 +114,26 @@ string comprobarRutaComando(string &input, string &cmd)
   return rutaComando;
 }
 
+bool existeRedireccionamiento(string &input, string &rutaRedireccionamiento){
+    rutaRedireccionamiento = "";
+    int pos = input.find('>');
+    if(pos != -1){
+        // Separamos el redireccionamiento
+        rutaRedireccionamiento = input.substr(pos+2, input.length());
+        if (input[0] == ' '){
+            input.erase(pos-1, input.length());
+        }else{
+            input.erase(pos, input.length());
+        }
+
+        ////////////////////////
+        return true;
+    }else{
+        rutaRedireccionamiento = "";
+        return false;
+    }
+}
+
 int main()
 {
   string comando_general;
@@ -127,5 +160,12 @@ int main()
   rutaComando = comprobarRutaComando(comando_general, cmd);
   // elementoscmd.push_back(rutaComando);
   elementoscmd.push_back(cmd);
+  
+  // Comprobar que existe y Separar el redireccionamiento
+  existeRedireccion = existeRedireccionamiento(comando_general,rutaRedireccionamiento);
+
+  // Identificar si se uso "~" para el directorio de inicio del usuario
+  reconocerHomeUser(rutaRedireccionamiento);
+  
   return 0;
 }
