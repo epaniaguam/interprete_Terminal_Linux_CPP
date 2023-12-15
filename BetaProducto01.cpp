@@ -30,17 +30,22 @@ void inprimirTerminal()
   cout << PURPLE << it->string() << "@ESIS" << WHITE << ":" << YELLOW << " $ " << SKYBLUE; //<< RESET
 }
 
-void reconocerHomeUser(string &ruta){
-    if(ruta[0] == '~'){
-        const char* homeDir = getenv("HOME"); // Obtener el directorio de inicio del usuario
-        
-        if (homeDir == nullptr) {
-            cerr << "No se pudo obtener el directorio de inicio del usuario." << endl;
-        }else{
-            ruta = ruta.substr(1,ruta.length());
-            ruta = string(homeDir) + ruta;
-        }
+void reconocerHomeUser(string &ruta)
+{
+  if (ruta[0] == '~')
+  {
+    const char *homeDir = getenv("HOME"); // Obtener el directorio de inicio del usuario
+
+    if (homeDir == nullptr)
+    {
+      cerr << "No se pudo obtener el directorio de inicio del usuario." << endl;
     }
+    else
+    {
+      ruta = ruta.substr(1, ruta.length());
+      ruta = string(homeDir) + ruta;
+    }
+  }
 }
 
 string comprobarRutaComando(string &input, string &cmd)
@@ -114,24 +119,62 @@ string comprobarRutaComando(string &input, string &cmd)
   return rutaComando;
 }
 
-bool existeRedireccionamiento(string &input, string &rutaRedireccionamiento){
-    rutaRedireccionamiento = "";
-    int pos = input.find('>');
-    if(pos != -1){
-        // Separamos el redireccionamiento
-        rutaRedireccionamiento = input.substr(pos+2, input.length());
-        if (input[0] == ' '){
-            input.erase(pos-1, input.length());
-        }else{
-            input.erase(pos, input.length());
-        }
-
-        ////////////////////////
-        return true;
-    }else{
-        rutaRedireccionamiento = "";
-        return false;
+bool existeRedireccionamiento(string &input, string &rutaRedireccionamiento)
+{
+  rutaRedireccionamiento = "";
+  int pos = input.find('>');
+  if (pos != -1)
+  {
+    // Separamos el redireccionamiento
+    rutaRedireccionamiento = input.substr(pos + 2, input.length());
+    if (input[0] == ' ')
+    {
+      input.erase(pos - 1, input.length());
     }
+    else
+    {
+      input.erase(pos, input.length());
+    }
+
+    ////////////////////////
+    return true;
+  }
+  else
+  {
+    rutaRedireccionamiento = "";
+    return false;
+  }
+}
+
+void extraerOpcionesArgumentos(string comando_general, vector<string> &opciones, vector<string> &argumentos)
+{
+  // Analizar el comando
+  int pos = 0;
+  while ((pos = comando_general.find(' ')) != -1)
+  {
+    string elemento = comando_general.substr(0, pos);
+    // Identificar si es el comando, opción o argumento
+    if (elemento[0] == '-')
+    {
+      opciones.push_back(elemento);
+    }
+    else
+    {
+      argumentos.push_back(elemento);
+    }
+    comando_general.erase(0, pos + 1);
+  }
+  // Obtener el ultimo argumento
+  if (comando_general != "")
+  {
+    argumentos.push_back(comando_general);
+  }
+
+  // Identificar si se uso "~" para el directorio de inicio del usuario
+  for (int i = 0; i < argumentos.size(); i++)
+  {
+    reconocerHomeUser(argumentos[i]);
+  }
 }
 
 int main()
@@ -160,12 +203,20 @@ int main()
   rutaComando = comprobarRutaComando(comando_general, cmd);
   // elementoscmd.push_back(rutaComando);
   elementoscmd.push_back(cmd);
-  
+
   // Comprobar que existe y Separar el redireccionamiento
-  existeRedireccion = existeRedireccionamiento(comando_general,rutaRedireccionamiento);
+  existeRedireccion = existeRedireccionamiento(comando_general, rutaRedireccionamiento);
 
   // Identificar si se uso "~" para el directorio de inicio del usuario
   reconocerHomeUser(rutaRedireccionamiento);
-  
+
+  // Extraer opciones y argumentos
+  extraerOpcionesArgumentos(comando_general, opciones, argumentos);
+
+  elementoscmd.insert(elementoscmd.end(), opciones.begin(), opciones.end());
+  elementoscmd.insert(elementoscmd.end(), argumentos.begin(), argumentos.end());
+
+  /******************************* FIN DE LA EXTRACCIÓN  ********************************/
+
   return 0;
 }
