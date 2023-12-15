@@ -179,107 +179,110 @@ void extraerOpcionesArgumentos(string comando_general, vector<string> &opciones,
 
 int main()
 {
-  string comando_general;
-
-  /************** MOSTRAR LA RUTA ACTUAL Y ESPERAR EL COMANDO DEL USUARIO ****************/
-  inprimirTerminal();
-
-  getline(cin, comando_general);
-
-  if (comando_general == "salir")
-  {
-    // break;
-  }
-
-  string rutaComando, cmd, rutaRedireccionamiento;
-  bool existeRedireccion;
-  vector<string> opciones;
-  vector<string> argumentos;
-  vector<string> elementoscmd;
-
-  /*********** EXTRAER LA INFORMACION DEL COMMANDO INGRESADO POR EL USUAIRIO ************/
-
-  // Extraer ruta (si existe) y extraer el comando
-  rutaComando = comprobarRutaComando(comando_general, cmd);
-  // elementoscmd.push_back(rutaComando);
-  elementoscmd.push_back(cmd);
-
-  // Comprobar que existe y Separar el redireccionamiento
-  existeRedireccion = existeRedireccionamiento(comando_general, rutaRedireccionamiento);
-
-  // Identificar si se uso "~" para el directorio de inicio del usuario
-  reconocerHomeUser(rutaRedireccionamiento);
-
-  // Extraer opciones y argumentos
-  extraerOpcionesArgumentos(comando_general, opciones, argumentos);
-
-  elementoscmd.insert(elementoscmd.end(), opciones.begin(), opciones.end());
-  elementoscmd.insert(elementoscmd.end(), argumentos.begin(), argumentos.end());
-
-  /******************************* FIN DE LA EXTRACCIÓN  ********************************/
-  /************************* AGREGAR LOS ARGUMENTOS PARA EXECV **************************/
-  char **args = nullptr;
+  while(true){
+    string comando_general;
   
-  // Número inicial de argumentos
-  int num_args = 0;
+    /************** MOSTRAR LA RUTA ACTUAL Y ESPERAR EL COMANDO DEL USUARIO ****************/
+    inprimirTerminal();
   
-  // Añadir elementos iterativamente desde el vector de strings
-  for (const auto& str : elementoscmd) {
-      args = static_cast<char**>(realloc(args, (num_args + 1) * sizeof(char*)));
-      args[num_args] = strdup(str.c_str());
-      num_args++;
-  }
+    getline(cin, comando_general);
   
-  // Añadir el último elemento nulo
-  args = static_cast<char**>(realloc(args, (num_args + 1) * sizeof(char*)));
-  args[num_args] = nullptr;
-  num_args++;
+    if (comando_general == "salir")
+    {
+      // break;
+    }
   
-  /******************************* FIN ARGUMENTOS PARA EXECV  ********************************/
-  /******************************* EJECUCION DE PROGRAMA  ******************************/
-  if (existeRedireccion){
-      int pidRedireccion = fork();
-      if (pidRedireccion == 0) { // proceso hijo para la redirección
-          // Configura la redirección
-          FILE* outputFile = freopen(rutaRedireccionamiento.c_str(), "w", stdout);
-          if (outputFile == nullptr) {
-              perror("freopen");
-              return 1;
-          }
-          
-          ////// Ejecuta el comando //////
-          // Llamar a execv con el array de argumentos
-          execv(rutaComando.c_str(), args);
-          // Si execv retorna, es porque hubo un error
-          perror("execv");
-          //////
-          return 1;
-      }else if (pidRedireccion > 0) {
-          // Proceso padre
-          waitpid(pidRedireccion, NULL, 0); // Espera a que el hijo termine
-      } else {
-          perror("fork");
-          return 1;
-      }
-      
-  }else{
-          ////// Ejecuta el comando //////
-          int pid = fork();
-          if (pid == 0) { // Proceso hijo
-              // Ejecuta el comando
-              // Llama a execv con el array de argumentos
-              execv(rutaComando.c_str(), args);
-              // Si execv retorna, es porque hubo un error
-              perror("execv");
-              return 1;
-          } else if (pid > 0) {
-              // Proceso padre
-              waitpid(pid, NULL, 0); // Espera a que el hijo termine
-          } else {
-              perror("fork");
-              return 1;
-          }
-          //////
+    string rutaComando, cmd, rutaRedireccionamiento;
+    bool existeRedireccion;
+    vector<string> opciones;
+    vector<string> argumentos;
+    vector<string> elementoscmd;
+  
+    /*********** EXTRAER LA INFORMACION DEL COMMANDO INGRESADO POR EL USUAIRIO ************/
+  
+    // Extraer ruta (si existe) y extraer el comando
+    rutaComando = comprobarRutaComando(comando_general, cmd);
+    // elementoscmd.push_back(rutaComando);
+    elementoscmd.push_back(cmd);
+  
+    // Comprobar que existe y Separar el redireccionamiento
+    existeRedireccion = existeRedireccionamiento(comando_general, rutaRedireccionamiento);
+  
+    // Identificar si se uso "~" para el directorio de inicio del usuario
+    reconocerHomeUser(rutaRedireccionamiento);
+  
+    // Extraer opciones y argumentos
+    extraerOpcionesArgumentos(comando_general, opciones, argumentos);
+  
+    elementoscmd.insert(elementoscmd.end(), opciones.begin(), opciones.end());
+    elementoscmd.insert(elementoscmd.end(), argumentos.begin(), argumentos.end());
+  
+    /******************************* FIN DE LA EXTRACCIÓN  ********************************/
+    /************************* AGREGAR LOS ARGUMENTOS PARA EXECV **************************/
+    char **args = nullptr;
+    
+    // Número inicial de argumentos
+    int num_args = 0;
+    
+    // Añadir elementos iterativamente desde el vector de strings
+    for (const auto& str : elementoscmd) {
+        args = static_cast<char**>(realloc(args, (num_args + 1) * sizeof(char*)));
+        args[num_args] = strdup(str.c_str());
+        num_args++;
+    }
+    
+    // Añadir el último elemento nulo
+    args = static_cast<char**>(realloc(args, (num_args + 1) * sizeof(char*)));
+    args[num_args] = nullptr;
+    num_args++;
+    
+    /******************************* FIN ARGUMENTOS PARA EXECV  ********************************/
+    /******************************* EJECUCION DE PROGRAMA  ******************************/
+    if (existeRedireccion){
+        int pidRedireccion = fork();
+        if (pidRedireccion == 0) { // proceso hijo para la redirección
+            // Configura la redirección
+            FILE* outputFile = freopen(rutaRedireccionamiento.c_str(), "w", stdout);
+            if (outputFile == nullptr) {
+                perror("freopen");
+                return 1;
+            }
+            
+            ////// Ejecuta el comando //////
+            // Llamar a execv con el array de argumentos
+            execv(rutaComando.c_str(), args);
+            // Si execv retorna, es porque hubo un error
+            perror("execv");
+            //////
+            return 1;
+        }else if (pidRedireccion > 0) {
+            // Proceso padre
+            waitpid(pidRedireccion, NULL, 0); // Espera a que el hijo termine
+        } else {
+            perror("fork");
+            return 1;
+        }
+        
+    }else{
+            ////// Ejecuta el comando //////
+            int pid = fork();
+            if (pid == 0) { // Proceso hijo
+                // Ejecuta el comando
+                // Llama a execv con el array de argumentos
+                execv(rutaComando.c_str(), args);
+                // Si execv retorna, es porque hubo un error
+                perror("execv");
+                return 1;
+            } else if (pid > 0) {
+                // Proceso padre
+                waitpid(pid, NULL, 0); // Espera a que el hijo termine
+            } else {
+                perror("fork");
+                return 1;
+            }
+            //////
+    }
+    
   }
   return 0;
 }
