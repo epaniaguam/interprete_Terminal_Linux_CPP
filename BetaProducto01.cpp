@@ -236,6 +236,50 @@ int main()
   num_args++;
   
   /******************************* FIN ARGUMENTOS PARA EXECV  ********************************/
-
+  /******************************* EJECUCION DE PROGRAMA  ******************************/
+  if (existeRedireccion){
+      int pidRedireccion = fork();
+      if (pidRedireccion == 0) { // proceso hijo para la redirección
+          // Configura la redirección
+          FILE* outputFile = freopen(rutaRedireccionamiento.c_str(), "w", stdout);
+          if (outputFile == nullptr) {
+              perror("freopen");
+              return 1;
+          }
+          
+          ////// Ejecuta el comando //////
+          // Llamar a execv con el array de argumentos
+          execv(rutaComando.c_str(), args);
+          // Si execv retorna, es porque hubo un error
+          perror("execv");
+          //////
+          return 1;
+      }else if (pidRedireccion > 0) {
+          // Proceso padre
+          waitpid(pidRedireccion, NULL, 0); // Espera a que el hijo termine
+      } else {
+          perror("fork");
+          return 1;
+      }
+      
+  }else{
+          ////// Ejecuta el comando //////
+          int pid = fork();
+          if (pid == 0) { // Proceso hijo
+              // Ejecuta el comando
+              // Llama a execv con el array de argumentos
+              execv(rutaComando.c_str(), args);
+              // Si execv retorna, es porque hubo un error
+              perror("execv");
+              return 1;
+          } else if (pid > 0) {
+              // Proceso padre
+              waitpid(pid, NULL, 0); // Espera a que el hijo termine
+          } else {
+              perror("fork");
+              return 1;
+          }
+          //////
+  }
   return 0;
 }
