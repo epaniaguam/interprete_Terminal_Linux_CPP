@@ -17,6 +17,7 @@
 #define SKYBLUE "\033[36m"
 #define WHITE "\033[37m"
 #define GREEN_LIGHT "\033[92m"
+#define SKYBLUE_LIGHT "\033[96m"
 
 using namespace std;
 
@@ -27,7 +28,7 @@ void inprimirTerminal()
   auto it = currentPath.begin();
   advance(it, 2);
 
-  cout << PURPLE << it->string() << "@ESIS" << WHITE << ":" << YELLOW << " $ " << SKYBLUE; //<< RESET
+  cout << PURPLE << it->string() << YELLOW << "@" << GREEN_LIGHT << "ESIS" << WHITE << ":" << YELLOW << "$ " << SKYBLUE_LIGHT; //<< RESET
 }
 
 void reconocerHomeUser(string &ruta)
