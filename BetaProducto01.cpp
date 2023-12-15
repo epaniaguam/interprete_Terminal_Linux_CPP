@@ -18,7 +18,6 @@ string extraerSudo(string &input)
     }
     return modoSudo;
 }
-
 string extraerRuta(string &input)
 {
     string ruta = "/bin/";
@@ -38,38 +37,7 @@ string extraerRuta(string &input)
     }
     return ruta;
 }
-string dosArgumentosConEspacio(string &input){
- 
-    string expdirectorio = "(~|(\\.\\/)|\\/)+(?:[a-zA-Z0-9_-]+\\/?)+";
-    //string expdirectorio = "\"*((~|(\\.\\/)|\\/)+(?:[a-zA-Z0-9_-]+\\/?)+)*"; //considera comillas, sin pruebas aun 100% fiables aun
-    string exparchivo = "(~|\\.|\\/)*(?:[a-zA-Z0-9_-]+\\/?)+(\\.[a-zA-Z0-9]+)+";
-    //string exparchivo = "\"*((~|\\.|\\/)*(?:[a-zA-Z0-9_-]+\\/? *)+(\\.[a-zA-Z0-9]+)+)\"*"; //considerada comillas, sin pruebas aun 100% fiables aun
 
-    // Unir las expresiones regulares en una expresión más grande
-    string dirTodir = expdirectorio + " " + expdirectorio;
-    string dirToarch = expdirectorio + " " + exparchivo;
-    string archToarch = exparchivo + " " + exparchivo;
-    string archTodir = exparchivo + " " + expdirectorio;smatch match1;
-    
-    // Crear una expresión regular compuesta
-    regex regexPattern("(" + dirTodir + ")|(" + dirToarch + ")|(" + archToarch + ")|(" + archTodir + ")");
-
-    // Buscar una coincidencia en el input
-    smatch match;
-    if (regex_search(input, match, regexPattern)) {
-        // Encontró una coincidencia
-        string coincidencia = match.str(0); // Obtener la coincidencia
-        input = regex_replace(input, regexPattern, ""); // Eliminar la coincidencia del input
-        
-        int dobleespacio = input.find("  ");
-        if(dobleespacio != string::npos)
-            input.replace(dobleespacio,2," "); // Eliminar espacios dobles
-        return coincidencia;
-    } else {
-        // No se encontraron coincidencias
-        return "";
-    }
-}
 string extraerRutacomando(string &input)
 {
     string ruta = "";
@@ -183,6 +151,52 @@ void extraerRedireccion(string &input,string &redireccion, string &archivo){
     }
 }
 
+void reconocerHomeUser(string &ruta){
+    if(ruta[0] == '~'){
+        const char* homeDir = getenv("HOME"); // Obtener el directorio de inicio del usuario
+        
+        if (homeDir == nullptr) {
+            cerr << "No se pudo obtener el directorio de inicio del usuario." << endl;
+        }else{
+
+            ruta = ruta.substr(1,ruta.length());
+            ruta = string(homeDir) + ruta;
+        }
+    }
+}
+string dosArgumentosConEspacio(string &input){
+ 
+    string expdirectorio = "(~|(\\.\\/)|\\/)+(?:[a-zA-Z0-9_-]+\\/?)+";
+    //string expdirectorio = "\"*((~|(\\.\\/)|\\/)+(?:[a-zA-Z0-9_-]+\\/?)+)*"; //considera comillas, sin pruebas aun 100% fiables aun
+    string exparchivo = "(~|\\.|\\/)*(?:[a-zA-Z0-9_-]+\\/?)+(\\.[a-zA-Z0-9]+)+";
+    //string exparchivo = "\"*((~|\\.|\\/)*(?:[a-zA-Z0-9_-]+\\/? *)+(\\.[a-zA-Z0-9]+)+)\"*"; //considerada comillas, sin pruebas aun 100% fiables aun
+
+    // Unir las expresiones regulares en una expresión más grande
+    string dirTodir = expdirectorio + " " + expdirectorio;
+    string dirToarch = expdirectorio + " " + exparchivo;
+    string archToarch = exparchivo + " " + exparchivo;
+    string archTodir = exparchivo + " " + expdirectorio;smatch match1;
+    
+    // Crear una expresión regular compuesta
+    regex regexPattern("(" + dirTodir + ")|(" + dirToarch + ")|(" + archToarch + ")|(" + archTodir + ")");
+
+    // Buscar una coincidencia en el input
+    smatch match;
+    if (regex_search(input, match, regexPattern)) {
+        // Encontró una coincidencia
+        string coincidencia = match.str(0); // Obtener la coincidencia
+        input = regex_replace(input, regexPattern, ""); // Eliminar la coincidencia del input
+        
+        int dobleespacio = input.find("  ");
+        if(dobleespacio != string::npos)
+            input.replace(dobleespacio,2," "); // Eliminar espacios dobles
+        return coincidencia;
+    } else {
+        // No se encontraron coincidencias
+        return "";
+    }
+}
+
 
 
 int main()
@@ -199,5 +213,12 @@ int main()
     comando = extraerComando(inputComando);
     argumentos = extraerArgumentos(inputComando);
     rutaComando = extraerRutacomando(inputComando);
+    reconocerHomeUser(rutaComando);
+
+    redireccion = ""; archivo = "";
+    //captura redireccion y archivo si es que hay esos elementos en el inputComando
+    //caso contrario los mantiene en vacio
+    extraerRedireccion(inputComando,redireccion,archivo); 
+    reconocerHomeUser(archivo);
 
 }
