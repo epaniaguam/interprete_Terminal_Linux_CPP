@@ -21,19 +21,27 @@
 
 using namespace std;
 
-void inprimirTerminal()
-{
+vector<string> vectordir(){
   filesystem::path currentPath = filesystem::current_path();
 
   // Separar la ruta en directorios y almacenarlos en un vector
   vector<string> directories;
-
-  for (const auto &entry : currentPath)
-  {
+  for (const auto &entry : currentPath){
     directories.push_back(entry.string());
   }
+  return directories;
+}
 
-  cout << BLUE << directories[2] << YELLOW << "@" << GREEN_LIGHT << "ESIS" << WHITE << ":" << PURPLE;
+vector<string> dir = vectordir();
+string user = dir[2];
+
+void inprimirTerminal()
+{
+  
+  vector<string> directories = vectordir();
+  cout << BLUE << user << YELLOW << "@" << GREEN_LIGHT << "ESIS" << WHITE << ":" << PURPLE;
+  
+
 
   if (directories.size() < 3)
   {
@@ -215,15 +223,13 @@ int main()
     else if (comando_general.substr(0, 2) == "cd")
     {
       // Extraer el argumento de la cadena de comando (ruta del directorio)
-      std::string directory = comando_general.substr(3);
+      string directory = comando_general.substr(3);
+      reconocerHomeUser(directory);
 
-      if (chdir(directory.c_str()) == 0)
-      {
-        std::cout << "Directorio cambiado exitosamente." << std::endl;
-      }
-      else
+      if (chdir(directory.c_str()) != 0)
       {
         perror("Error al cambiar el directorio");
+        // cout << "Directorio cambiado exitosamente." << endl;
       }
       continue;
     }
