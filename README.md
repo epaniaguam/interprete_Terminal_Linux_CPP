@@ -19,22 +19,21 @@ Para usar este intérprete de terminal, ejecuta el programa compilado:
 ```
 ## Comandos Testeados
 
-| Comandos  | Descripción                                             |
-|-----------|---------------------------------------------------------|
-| cp        | Copia archivos y directorios.                            |
-| ls        | Lista los contenidos de un directorio.                   |
-| rm        | Elimina archivos o directorios.                          |
-| touch     | Crea un archivo vacío o actualiza su marca de tiempo.    |
-| mkdir     | Crea un nuevo directorio.                                |
-| less      | Permite visualizar un archivo de texto página por página. |
-| nano      | Editor de texto en la terminal.                          |
-| cat       | Muestra el contenido de un archivo.                      |
-| pwd       | Muestra la ruta del directorio actual.                   |
-| ip addr   | Muestra y configura información de red.                   |
-| less/more | Visualiza un archivo de texto página por página.          |
-| ps        | Muestra los procesos en ejecución.                       |
-| mv        | Mueve o renombra archivos y directorios.                  |
-| vim       | Editor de texto en la terminal.                          |
+| Comando          | Parámetros             | Descripción y Ejemplo                                      |
+|------------------|------------------------|-------------------------------------------------------------|
+| `cp`             | `<origen> <destino>`   | Copia archivos o directorios. Ejemplo: `cp archivo.txt carpeta/` |
+| `ls`             | `-l`, `-a`, `-h`       | Lista archivos y directorios. Ejemplo: `ls -l`               |
+| `rm`             | `-r`, `-f`             | Elimina archivos o directorios. Ejemplo: `rm -r carpeta/`     |
+| `touch`          | `<archivo>`            | Crea un nuevo archivo vacío. Ejemplo: `touch nuevo.txt`      |
+| `mkdir`          | `<nombre_directorio>`   | Crea un nuevo directorio. Ejemplo: `mkdir nueva_carpeta`    |
+| `less`           | `<archivo>`            | Visualiza el contenido de un archivo de forma paginada. Ejemplo: `less archivo.txt` |
+| `nano`           | `<archivo>`            | Editor de texto en la terminal. Ejemplo: `nano archivo.txt`   |
+| `cat`            | `<archivo>`            | Muestra el contenido de un archivo. Ejemplo: `cat archivo.txt` |
+| `pwd`            |                        | Muestra la ruta del directorio actual. Ejemplo: `pwd`        |
+| `ip addr`        |                        | Muestra la configuración de red. Ejemplo: `ip addr show`     |
+| `ps`             | `-aux`                 | Muestra los procesos en ejecución. Ejemplo: `ps aux`         |
+| `mv`             | `<origen> <destino>`   | Mueve archivos o directorios. Ejemplo: `mv archivo.txt carpeta/` |
+| `vim`            | `<archivo>`            | Editor de texto avanzado en la terminal. Ejemplo: `vim archivo.txt` |
 
 
 ## Comando para salir del terminal
