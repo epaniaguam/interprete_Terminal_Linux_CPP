@@ -1,6 +1,0 @@
-total 404
--rwxr-xr-x 1 red red 357520 Dec 15 11:15 Interprete_Terminal
--rw-r--r-- 1 red red   8730 Dec 15 10:52 Interprete_Terminal.cpp
--rw-r--r-- 1 red red  35149 Dec 15 00:14 LICENSE
--rw-r--r-- 1 red red   3166 Dec 15 01:01 README.md
--rw-r--r-- 1 red red      0 Dec 15 11:17 test.txt
