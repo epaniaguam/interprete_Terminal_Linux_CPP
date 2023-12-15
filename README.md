@@ -17,6 +17,24 @@ Para usar este intérprete de terminal, ejecuta el programa compilado:
 ```bash
 ./Interprete_Terminal
 ```
+## Comandos Testeados
+
+| Comandos  |
+|-----------|
+| cp        |
+| ls        |
+| rm        |
+| touch     |
+| mkdir     |
+| less      |
+| nano      |
+| cat       |
+| pwd       |
+| ip addr   |
+| less/more |
+| ps        |
+| mv        |
+| vim       |
 
 ## Comando para salir del terminal
 Para finalizar la ejecución de la terminal deberemos introducir el comando "salir".
