@@ -201,6 +201,19 @@ string dosArgumentosConEspacio(string &input){
 
 int main()
 {
+    string inputComando;
+    
+    //inputComando = "/bin/ ls -lsa / > ~/Descargas/salida.txt";
+    //inputComando = "/bin/ ls ~/Descargas/";
+    //inputComando = "/bin/ rm ~/Descargas/pdf-msx88_compress.pdf";
+    //inputComando = "clear";
+    inputComando = "/bin/ cp -r /directorio /copia_directorio > ~/Dodumentos/texto.txt";
+    //inputComando = "rm 11.txt";
+
+
+    //cout << "▒ESIS $ ";
+    //getline(cin,inputComando);
+    
     string modoSudo,ruta,comando, argumentos,redireccion,archivo, rutaComando, dosArgumentos,argOrigen,argDestino;
     modoSudo = extraerSudo(inputComando); // aun sin usar
     ruta = extraerRuta(inputComando);
@@ -220,5 +233,63 @@ int main()
     //caso contrario los mantiene en vacio
     extraerRedireccion(inputComando,redireccion,archivo); 
     reconocerHomeUser(archivo);
+
+    if (redireccion == ">" && archivo != "") {
+        int pidRedireccion = fork();
+        if (pidRedireccion == 0) { // proceso hijo para la redirección
+            // Configura la redirección
+            FILE* outputFile = freopen(archivo.c_str(), "w", stdout);
+            if (outputFile == nullptr) {
+                perror("freopen");
+                return 1;
+            }
+
+            // Ejecuta el comando
+            ruta += comando;
+
+            if(!rutaComando.empty() && !argumentos.empty()){
+                execl(ruta.c_str(), comando.c_str(), argumentos.c_str(),rutaComando.c_str(), NULL);
+            }else if (!argumentos.empty() && !dosArgumentos.empty()) {
+                execl(ruta.c_str(), comando.c_str(), argumentos.c_str(), argOrigen.c_str(),argDestino.c_str(), NULL);
+            }else if (!dosArgumentos.empty()) {
+                execl(ruta.c_str(), comando.c_str(), argOrigen.c_str(),argDestino.c_str(), NULL);
+            }else if (!argumentos.empty()) {
+                execl(ruta.c_str(), comando.c_str(), argumentos.c_str(), NULL);
+            }else if (!rutaComando.empty()){
+                execl(ruta.c_str(), comando.c_str(), rutaComando.c_str(), NULL);
+            } else {
+                execl(ruta.c_str(), comando.c_str(), NULL);
+            }
+
+            perror("execl");
+            return 1;
+        } else {
+            waitpid(pidRedireccion, NULL, 0); // Espera a que el hijo termine
+        }
+    } else {
+        // Ejecuta el comando sin redirección
+        ruta += comando;
+        int pid = fork();
+        if (pid == 0) { // proceso hijo
+            if(!rutaComando.empty() && !argumentos.empty()){
+                execl(ruta.c_str(), comando.c_str(), argumentos.c_str(),rutaComando.c_str(), NULL);
+            }else if (!argumentos.empty() && !dosArgumentos.empty()) {
+                execl(ruta.c_str(), comando.c_str(), argumentos.c_str(), argOrigen.c_str(),argDestino.c_str(), NULL);
+            }else if (!dosArgumentos.empty()) {
+                execl(ruta.c_str(), comando.c_str(), argOrigen.c_str(),argDestino.c_str(), NULL);
+            }else if (!argumentos.empty()) {
+                execl(ruta.c_str(), comando.c_str(), argumentos.c_str(), NULL);
+            }else if (!rutaComando.empty()){
+                execl(ruta.c_str(), comando.c_str(), rutaComando.c_str(), NULL);
+            } else {
+                execl(ruta.c_str(), comando.c_str(), NULL);
+            }
+            perror("execl");
+            return 1;
+        } else {
+            wait(0);
+        }
+    }
+
 
 }
