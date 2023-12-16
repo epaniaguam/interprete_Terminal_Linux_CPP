@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+# Archvos de texto
+*.txt
+
+# Mesas de Trabajo
+*.code-workspace
