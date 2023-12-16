@@ -20,7 +20,7 @@
 #define SKYBLUE_LIGHT "\033[96m"
 
 // ESTADOS
-#define RESET 1
+#define ERROR 1
 #define BREAK 2
 #define CONTINUE 3
 
@@ -31,8 +31,11 @@ string comprobarRutaComando(string &, string &);
 bool existeRedireccionamiento(string &, string &);
 void extraerOpcionesArgumentos(string, vector<string> &, vector<string> &);
 
-struct Comando
+class Comando
 {
+public:
+  // Comando completo ingresado por el usuario
+  string ruta_comando;
   string comando_completo;
 
   // Desestructuracion del comando
@@ -54,6 +57,7 @@ struct Comando
     istringstream iss(cmd);
     comando_completo = cmd;
     string token;
+
     while (iss >> token)
     {
       if (token == "<")
@@ -87,8 +91,43 @@ struct Comando
         linea_comando.push_back(token);
       }
     }
+    if (comando_principal[0] == '/')
+    {
+      ruta_comando = comando_principal;
+      comando_principal = comando_principal.substr(comando_principal.find_last_of("/") + 1);
+    }
+    else
+    {
+      ruta_comando = "/bin/" + comando_principal;
+    }
   }
+
+  void imprimir();
 };
+
+void Comando::imprimir()
+{
+  cout << SKYBLUE << "Comando: " << WHITE << comando_completo << endl;
+  cout << SKYBLUE << "Ruta: " << WHITE << ruta_comando << endl;
+  cout << SKYBLUE << "Comando principal: " << WHITE << comando_principal << endl;
+  cout << SKYBLUE << "Opciones: " << WHITE;
+  for (auto &opcion : opciones)
+    cout << opcion << " ";
+  cout << endl;
+  cout << SKYBLUE << "Argumentos: " << WHITE;
+  for (auto &argumento : argumentos)
+    cout << argumento << " ";
+  cout << endl;
+  cout << SKYBLUE << "Redireccionamiento: " << WHITE << redireccionamiento << endl;
+  cout << SKYBLUE << "Archivo de entrada: " << WHITE << archivoEntrada << endl;
+  cout << SKYBLUE << "Archivo de salida: " << WHITE << archivoSalida << endl;
+  cout << SKYBLUE << "Usar pipe: " << WHITE << usarPipe << endl;
+
+  cout << SKYBLUE << "Linea de comando: " << WHITE;
+  for (auto &elemento : linea_comando)
+    cout << elemento << " ";
+  cout << endl;
+}
 
 class Terminal
 {
@@ -179,7 +218,7 @@ int Terminal::ejecutarComando(Comando comando)
       if (outputFile == nullptr)
       {
         perror("freopen");
-        return RESET;
+        return ERROR;
       }
 
       ////// Ejecuta el comando //////
@@ -188,7 +227,7 @@ int Terminal::ejecutarComando(Comando comando)
       // Si execv retorna, es porque hubo un error
       perror("execv");
       //////
-      return RESET;
+      return ERROR;
     }
     else if (pidRedireccion > 0)
     {
@@ -198,7 +237,7 @@ int Terminal::ejecutarComando(Comando comando)
     else
     {
       perror("fork");
-      return RESET;
+      return ERROR;
     }
   }
   else
@@ -212,7 +251,7 @@ int Terminal::ejecutarComando(Comando comando)
       execv(rutaComando.c_str(), args);
       // Si execv retorna, es porque hubo un error
       perror("execv");
-      return RESET;
+      return ERROR;
     }
     else if (pid > 0)
     {
@@ -222,7 +261,7 @@ int Terminal::ejecutarComando(Comando comando)
     else
     {
       perror("fork");
-      return RESET;
+      return ERROR;
     }
   }
   return 0;
@@ -418,12 +457,19 @@ int main()
 
     int estado = terminal.ejecutarComando(comando);
 
-    if (estado == RESET)
-      return RESET;
+    if (estado == ERROR)
+      return ERROR;
     else if (estado == BREAK)
       break;
     else if (estado == CONTINUE)
       continue;
   }
+  /*
+  string cmd;
+  getline(cin, cmd);
+  Comando comando(cmd);
+
+  comando.imprimir();
+  */
   return 0;
 }
