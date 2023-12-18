@@ -49,7 +49,7 @@ Para finalizar la ejecución de la terminal deberemos introducir el comando "sal
   salir
 ```
 > [!WARNING]
-> El comando de "cd" no es funcional se debe utilizar rutas absolutas o relativas para ejecutar los comandos
+> No Soporta Tuberias "|" Pipes
 
 > [!NOTE]
 > En caso se quiera ejecutar un comando distinto al de la carpeta /bin/ se debe especificar al inicio del comando.
