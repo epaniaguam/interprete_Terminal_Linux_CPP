@@ -45,7 +45,25 @@ public:
   void imprimir();
   const char *comand_path();
   char *const *comand_argv();
+  void completarRuta(string &);
 };
+
+void Comando::completarRuta(string &ruta)
+{
+  if (ruta[0] == '~')
+  {
+    const char *homeDir = getenv("HOME"); // Obtener el directorio de inicio del usuario
+    if (homeDir != nullptr)
+    {
+      ruta = ruta.substr(1, ruta.length());
+      ruta = string(homeDir) + ruta;
+    }
+    else
+    {
+      cerr << "No se pudo obtener el directorio de inicio del usuario." << endl;
+    }
+  }
+}
 
 Comando::Comando(string &cmd) : usarPipe(false)
 {
@@ -78,6 +96,7 @@ Comando::Comando(string &cmd) : usarPipe(false)
         opciones.push_back(token);
       else
         argumentos.push_back(token);
+      completarRuta(token);
       linea_comando.push_back(token);
     }
   }
