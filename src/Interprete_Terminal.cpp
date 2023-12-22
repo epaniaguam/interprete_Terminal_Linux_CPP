@@ -23,5 +23,12 @@ int main()
       continue;
   }
 
+  /* string comando_general;
+  getline(cin, comando_general);
+
+  Comando cmd(comando_general);
+
+  cmd.imprimir();
+ */
   return 0;
 }

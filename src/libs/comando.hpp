@@ -33,6 +33,7 @@ public:
   string archivoSalida;
 
   bool usarPipe;
+  bool segundoplano;
 
   string comando_principal;
   vector<string> opciones;
@@ -65,7 +66,7 @@ void Comando::completarRuta(string &ruta)
   }
 }
 
-Comando::Comando(string &cmd) : usarPipe(false)
+Comando::Comando(string &cmd) : usarPipe(false), segundoplano(false)
 {
   // Analizar el comando y extraer el nombre, argumentos y redirecciones
   istringstream iss(cmd);
@@ -87,6 +88,10 @@ Comando::Comando(string &cmd) : usarPipe(false)
     else if (token == "|")
     {
       usarPipe = true;
+    }
+    else if (token == "&")
+    {
+      segundoplano = true;
     }
     else
     {

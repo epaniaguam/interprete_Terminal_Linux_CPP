@@ -75,7 +75,8 @@ int Terminal::ejecutarComando(Comando comando)
     }
     else if (pidRedireccion > 0)
     {
-      waitpid(pidRedireccion, NULL, 0);
+      if (!comando.segundoplano)
+        waitpid(pidRedireccion, NULL, 0);
     }
     else
     {
@@ -94,7 +95,8 @@ int Terminal::ejecutarComando(Comando comando)
     }
     else if (pid > 0)
     {
-      waitpid(pid, NULL, 0);
+      if (!comando.segundoplano)
+        waitpid(pid, NULL, 0);
     }
     else
     {
