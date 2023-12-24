@@ -49,6 +49,7 @@ public:
   void imprimir();
   const char *comand_path();
   char *const *comand_argv();
+  char *const *comand_argvPipe();
   void completarRuta(string &);
 };
 
@@ -88,12 +89,9 @@ Comando::Comando(string &cmd) : usarPipe(false), segundoplano(false)
       redireccionamiento = token;
       iss >> archivoSalida;
     }
-    // else if (token == "|")
-    // {
-    //   if (redireccionamiento == "")
-    //     usarPipe = true;
-      
-    // }
+    else if (token == "|"){
+        usarPipe = true;
+    }
     else if (token == "&")
     {
       segundoplano = true;
@@ -107,10 +105,9 @@ Comando::Comando(string &cmd) : usarPipe(false), segundoplano(false)
       else if (token[0] == '-'){
         opciones.push_back(token);
       }
-      else if (token[0] == '|'){
-        usarPipe = true;
-        // iss >> archivoSalida;
-      }
+      // else if (token[0] == '|'){
+      //   usarPipe = true;
+      // }
       else{
         if(usarPipe == false)
           argumentos.push_back(token);
@@ -135,7 +132,9 @@ Comando::Comando(string &cmd) : usarPipe(false), segundoplano(false)
   else
   {
     ruta_comando = "/bin/" + comando_principal;
-    ruta_comandoPipe = "/bin/" + argumentosPipe[0];
+    if (usarPipe == true) {
+      ruta_comandoPipe = "/bin/" + argumentosPipe[0];  
+    }
   }
   }
 
@@ -174,6 +173,17 @@ char *const *Comando::comand_argv()
   const char *arrayDeArgumentos[nargs + 1];
   for (int i = 0; i < nargs; ++i)
     arrayDeArgumentos[i] = linea_comando[i].c_str();
+  arrayDeArgumentos[nargs] = nullptr;
+  char *const *argv = const_cast<char *const *>(arrayDeArgumentos);
+  return argv;
+}
+
+char *const *Comando::comand_argvPipe()
+{
+  int nargs = linea_comandoPipe.size();
+  const char *arrayDeArgumentos[nargs + 1];
+  for (int i = 0; i < nargs; ++i)
+    arrayDeArgumentos[i] = linea_comandoPipe[i].c_str();
   arrayDeArgumentos[nargs] = nullptr;
   char *const *argv = const_cast<char *const *>(arrayDeArgumentos);
   return argv;
