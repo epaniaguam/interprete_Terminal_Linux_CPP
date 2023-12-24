@@ -75,8 +75,11 @@ int Terminal::ejecutarComando(Comando comando)
     }
     else if (pidRedireccion > 0)
     {
-      if (!comando.segundoplano)
+      if (!comando.segundoplano){
         waitpid(pidRedireccion, NULL, 0);
+      }else{
+        cout << "Proceso en segundo plano: " << pidRedireccion << endl;
+      }
     }
     else
     {
@@ -95,8 +98,11 @@ int Terminal::ejecutarComando(Comando comando)
     }
     else if (pid > 0)
     {
-      if (!comando.segundoplano)
+      if (!comando.segundoplano){
         waitpid(pid, NULL, 0);
+      }else{
+        cout << "Proceso en segundo plano: " << pid << endl;
+      }
     }
     else
     {

@@ -25,8 +25,10 @@ public:
   string comando_completo;
   // Comando completo ingresado por el usuario
   string ruta_comando;
+  string ruta_comandoPipe;
   // Desestructuracion del comando
   vector<string> linea_comando;
+  vector<string> linea_comandoPipe;
 
   string redireccionamiento;
   string archivoEntrada;
@@ -38,6 +40,7 @@ public:
   string comando_principal;
   vector<string> opciones;
   vector<string> argumentos;
+  vector<string> argumentosPipe;
 
   // Constructor
   Comando(string &);
@@ -85,26 +88,45 @@ Comando::Comando(string &cmd) : usarPipe(false), segundoplano(false)
       redireccionamiento = token;
       iss >> archivoSalida;
     }
-    else if (token == "|")
-    {
-      usarPipe = true;
-    }
+    // else if (token == "|")
+    // {
+    //   if (redireccionamiento == "")
+    //     usarPipe = true;
+      
+    // }
     else if (token == "&")
     {
       segundoplano = true;
     }
     else
     {
-      if (linea_comando.size() == 0)
+      
+      if (linea_comando.size() == 0){
         comando_principal = token;
-      else if (token[0] == '-')
+      }
+      else if (token[0] == '-'){
         opciones.push_back(token);
-      else
-        argumentos.push_back(token);
+      }
+      else if (token[0] == '|'){
+        usarPipe = true;
+        // iss >> archivoSalida;
+      }
+      else{
+        if(usarPipe == false)
+          argumentos.push_back(token);
+        else
+          argumentosPipe.push_back(token);
+      }
+
       completarRuta(token);
-      linea_comando.push_back(token);
+      if (usarPipe == false){
+        linea_comando.push_back(token);
+      }else{
+        linea_comandoPipe.push_back(token);
+      }
     }
   }
+
   if (comando_principal[0] == '/')
   {
     ruta_comando = comando_principal;
@@ -113,8 +135,9 @@ Comando::Comando(string &cmd) : usarPipe(false), segundoplano(false)
   else
   {
     ruta_comando = "/bin/" + comando_principal;
+    ruta_comandoPipe = "/bin/" + argumentosPipe[0];
   }
-}
+  }
 
 void Comando::imprimir()
 {
