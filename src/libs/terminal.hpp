@@ -59,33 +59,102 @@ int Terminal::ejecutarComando(Comando comando)
   }
   else if (comando.redireccionamiento == ">")
   {
-    completarRuta(comando.archivoSalida);    
-    int pidRedireccion = fork();
-    if (pidRedireccion == 0)
-    {
-      FILE *outputFile = freopen(comando.archivoSalida.c_str(), "w", stdout);
-      if (outputFile == nullptr)
+    completarRuta(comando.archivoSalida);
+
+    if(comando.usarPipe){
+      int pipefd[2];
+      pipe(pipefd); // Crear la tubería
+
+      int pid = fork(); // Crear un nuevo proceso
+      if (pid == 0)
       {
-        perror("freopen");
+        // Código del proceso hijo
+        // Redirigir la salida estándar al extremo de escritura de la tubería
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[0]);  // Cerrar el extremo de lectura de la tubería
+
+        // Ejecutar el primer comando
+        execv(comando.comand_path(), comando.comand_argv());
+        perror("execv");
         return ERROR;
       }
-      execv(comando.comand_path(), comando.comand_argv());
-      perror("execv");
-      return ERROR;
-    }
-    else if (pidRedireccion > 0)
-    {
-      if (!comando.segundoplano){
-        waitpid(pidRedireccion, NULL, 0);
-      }else{
-        cout << "Proceso en segundo plano: " << pidRedireccion << endl;
+      else
+      {
+        // Código del proceso padre
+        // Cerrar el extremo de escritura de la tubería en el proceso padre
+        close(pipefd[1]);
+
+        // Esperar a que el proceso hijo termine
+        waitpid(pid, NULL, 0);
+
+        // Ahora puedes realizar la redirección de entrada para el siguiente comando (segundo comando)
+        // (Este código es un ejemplo, necesitarás ajustarlo según tus necesidades)
+        int stdin_original = dup(STDIN_FILENO);  // Guardar el descriptor de archivo original
+
+        // Redirigir la entrada estándar al extremo de lectura de la tubería
+        dup2(pipefd[0], STDIN_FILENO);
+        close(pipefd[0]);  // Cerrar el extremo de lectura de la tubería
+
+        // Crear un nuevo proceso para el segundo comando
+        pid_t pid2 = fork();
+
+        if (pid2 == -1) {
+        perror("fork");
+        return ERROR;
+        }
+
+        if (pid2 == 0) {
+          // Código del segundo proceso hijo
+          // Ejecutar el segundo comando
+          FILE *outputFile = freopen(comando.archivoSalida.c_str(), "w", stdout);
+          if (outputFile == nullptr)
+          {
+            perror("freopen");
+            return ERROR;
+          }
+          execv(comando.ruta_comandoPipe.c_str(), comando.comand_argvPipe());
+          perror("execv");
+          return ERROR;
+        } else {
+            // Código del proceso padre
+            // Restaurar la entrada estándar al descriptor original
+            dup2(stdin_original, STDIN_FILENO);
+            close(stdin_original);
+
+            // Esperar a que el segundo proceso hijo termine
+            waitpid(pid2, NULL, 0);
+        }
+      }
+    } else {
+      int pidRedireccion = fork();
+      if (pidRedireccion == 0)
+      {
+        FILE *outputFile = freopen(comando.archivoSalida.c_str(), "w", stdout);
+        if (outputFile == nullptr)
+        {
+          perror("freopen");
+          return ERROR;
+        }
+        execv(comando.comand_path(), comando.comand_argv());
+        perror("execv");
+        return ERROR;
+      }
+      else if (pidRedireccion > 0)
+      {
+        if (!comando.segundoplano){
+          waitpid(pidRedireccion, NULL, 0);
+        }else{
+          cout << "Proceso en segundo plano: " << pidRedireccion << endl;
+        }
+      }
+      else
+      {
+        perror("fork");
+        return ERROR;
       }
     }
-    else
-    {
-      perror("fork");
-      return ERROR;
-    }
+
+
   }
   else
   {
