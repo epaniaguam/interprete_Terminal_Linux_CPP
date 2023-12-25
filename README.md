@@ -48,9 +48,6 @@ Para finalizar la ejecución de la terminal deberemos introducir el comando "sal
 ```bash
   salir
 ```
-> [!WARNING]
-> No Soporta Tuberias "|" Pipes
-
 > [!NOTE]
 > En caso se quiera ejecutar un comando distinto al de la carpeta /bin/ se debe especificar al inicio del comando.
 
